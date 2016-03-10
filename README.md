@@ -26,3 +26,7 @@ SEGMENTS_PER_BATCH = 1
 
 The pipeline is very rough and has undergone limited testing so user beware.
 
+### CITE
+If you find this pipeline useful, please cite the original Pilon paper:<br>
+Loman NJ et. al. [A complete bacterial genome assembled de novo using only nanopore sequencing data.](http://www.nature.com/nmeth/journal/v12/n8/abs/nmeth.3444.html) Nature Methods, 2015.
+
