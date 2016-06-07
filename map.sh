@@ -31,3 +31,6 @@ if [ -e $PREFIX.pp.sorted.bam ]; then
 fi
 
 make -f $SCRIPT_PATH/nanopolish/scripts/consensus.make READS=$READS ASSEMBLY=$ASM
+
+# run the first mapping job to make sure we have all files needed created, otherwise there is a race condition
+sh  $SCRIPT_PATH/nanoParallelSGE.sh 1
