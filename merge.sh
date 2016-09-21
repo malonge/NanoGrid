@@ -30,4 +30,4 @@ if [ -e $ASMPREFIX.polished.fa ]; then
    exit
 fi
 
-python $SCRIPT_PATH/nanopolish/scripts/nanopolish_merge.py $ASM $ASMPREFIX.[0-9]*.fa > $ASMPREFIX.polished.fa && rm $ASMPREFIX.[0-9]*.fa
+python $SCRIPT_PATH/nanopolish/scripts/nanopolish_merge.py $ASMPREFIX.[0-9]*.fa > $ASMPREFIX.polished.fa && rm $ASMPREFIX.[0-9]*.fa
