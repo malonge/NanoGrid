@@ -25,12 +25,24 @@ PREFIX=`cat prefix`
 SCRIPT_PATH=`cat scripts`
 READS=`cat reads`
 
-if [ -e $PREFIX.pp.sorted.bam ]; then
+if [ -e $PREFIX.eventalign.sorted.bam ]; then
    echo "Already done"
    exit
 fi
 
-make -f $SCRIPT_PATH/nanopolish/scripts/consensus.make READS=$READS ASSEMBLY=$ASM
+if [ ! -e $ASM.sa ]; then
+   bwa index $ASM && touch $PREFIX.index.success
+fi
+if [ ! -e $PREFIX.map.success ]; then
+   (bwa mem -x ont2d -t 8 $ASM $READS && touch $PREFIX.map.success) | samtools view -Sb - | samtools sort  - -o $PREFIX.sorted.bam
+   samtools index $PREFIX.sorted.bam
+fi
+
+if [ ! -e $PREFIX.eventalign.success ]; then
+   # Align the reads in event space
+   ($SCRIPT_PATH/nanopolish/nanopolish eventalign -t 8 --sam -r $READS -b $PREFIX.sorted.bam -g $ASM --models $SCRIPT_PATH/nanopolish/etc/r9-models/nanopolish_models.fofn && touch $PREFIX.eventalign.success) | samtools view -Sb - | samtools sort - -o $PREFIX.eventalign.sorted.bam
+   samtools index $PREFIX.eventalign.sorted.bam
+fi
 
 # run the first mapping job to make sure we have all files needed created, otherwise there is a race condition
 sh  $SCRIPT_PATH/nanoParallelSGE.sh 1

@@ -86,11 +86,10 @@ echo "$ASMPREFIX" > asmprefix
 echo "$SCRIPT_PATH" > scripts
 echo "$READS" > reads
 
-echo "Running with $PREFIX $ASM $READS mappings on $NUM_CTG contigs"
-
 # split the mappings
 python $SCRIPT_PATH/nanopolish/scripts/nanopolish_makerange.py  $ASM > $ASMPREFIX.fofn
 NUM_JOBS=`wc -l $ASMPREFIX.fofn |awk '{print $1}'`
+echo "Running with $PREFIX $ASM $READS mappings on $NUM_CTG contigs ($NUM_JOBS) jobs"
 
 # now we can submit each range as an individual job and a merge job for the end
 qsub -A ${ASMPREFIX}_nanopolish -V -pe thread 8 -l mem_free=2g -cwd -N "${ASMPREFIX}map" -j y -o `pwd`/map.out $SCRIPT_PATH/map.sh

@@ -24,6 +24,7 @@ ASM=`cat asm`
 PREFIX=`cat prefix`
 ASMPREFIX=`cat asmprefix`
 SCRIPT_PATH=`cat scripts`
+READS=`cat reads`
 
 jobid=$SGE_TASK_ID
 if [ x$jobid = x -o x$jobid = xundefined -o x$jobid = x0 ]; then
@@ -53,4 +54,5 @@ if [ -e $ASMPREFIX.$jobid.fa ]; then
    echo "Already done"
    exit 
 fi
-/data/projects/phillippy/software/NanoGrid/nanopolish/nanopolish consensus -o $ASMPREFIX.$jobid.fa -w $line -r $PREFIX.pp.fa -b $PREFIX.pp.sorted.bam -g $ASM -t 4
+
+$SCRIPT_PATH/nanopolish/nanopolish variants --fix-homopolymers --consensus $ASMPREFIX.$jobid.fa -w $line -r $READS -b $PREFIX.sorted.bam -g $ASM -e $PREFIX.eventalign.sorted.bam -t 4 --min-candidate-frequency 0.1 --models $SCRIPT_PATH/nanopolish/etc/r9-models/nanopolish_models.fofn
