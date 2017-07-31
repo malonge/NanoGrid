@@ -25,23 +25,19 @@ PREFIX=`cat prefix`
 SCRIPT_PATH=`cat scripts`
 READS=`cat reads`
 
-if [ -e $PREFIX.eventalign.sorted.bam ]; then
+if [ -e $PREFIX.sorted.cram ]; then
    echo "Already done"
-   exit
-fi
-
-if [ ! -e $ASM.sa ]; then
-   bwa index $ASM && touch $PREFIX.index.success
-fi
-if [ ! -e $PREFIX.map.success ]; then
-   (bwa mem -x ont2d -t 8 $ASM $READS && touch $PREFIX.map.success) | samtools view -Sb - | samtools sort  - -o $PREFIX.sorted.bam
-   samtools index $PREFIX.sorted.bam
-fi
-
-if [ ! -e $PREFIX.eventalign.success ]; then
-   # Align the reads in event space
-   ($SCRIPT_PATH/nanopolish/nanopolish eventalign -t 8 --sam -r $READS -b $PREFIX.sorted.bam -g $ASM --models $SCRIPT_PATH/nanopolish/etc/r9-models/nanopolish_models.fofn && touch $PREFIX.eventalign.success) | samtools view -Sb - | samtools sort - -o $PREFIX.eventalign.sorted.bam
-   samtools index $PREFIX.eventalign.sorted.bam
+else
+   if [ ! -e $ASM.sa ]; then
+      bwa index $ASM && touch $PREFIX.index.success
+   fi
+   if [ ! -e $PREFIX.map.success ]; then
+      (bwa mem -x ont2d -t 8 $ASM $READS > $PREFIX.sam && touch $PREFIX.map.success)
+      if [ -e $PREFIX.map.success ]; then
+         /data/projects/phillippy/software/samtools-develop/samtools sort -O cram -o $PREFIX.sorted.cram -T $PREFIX.tmp --reference=asm.fa $PREFIX.sam
+         /data/projects/phillippy/software/samtools-develop/samtools index $PREFIX.sorted.cram
+      fi
+   fi
 fi
 
 # run the first mapping job to make sure we have all files needed created, otherwise there is a race condition

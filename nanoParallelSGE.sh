@@ -55,4 +55,4 @@ if [ -e $ASMPREFIX.$jobid.fa ]; then
    exit 
 fi
 
-$SCRIPT_PATH/nanopolish/nanopolish variants --fix-homopolymers --consensus $ASMPREFIX.$jobid.fa -w $line -r $READS -b $PREFIX.sorted.bam -g $ASM -e $PREFIX.eventalign.sorted.bam -t 4 --min-candidate-frequency 0.1 --models $SCRIPT_PATH/nanopolish/etc/r9-models/nanopolish_models.fofn
+$SCRIPT_PATH/nanopolish/nanopolish variants --faster --consensus=$ASMPREFIX.$jobid.fa -w $line -r $READS -b $PREFIX.sorted.cram -g $ASM -t 4 --min-candidate-frequency 0.1
