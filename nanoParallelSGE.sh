@@ -26,7 +26,19 @@ ASMPREFIX=`cat asmprefix`
 SCRIPT_PATH=`cat scripts`
 READS=`cat reads`
 
-jobid=$SGE_TASK_ID
+if [ -e `pwd`/CONFIG ]; then
+   CONFIG=`pwd`/CONFIG
+else
+   CONFIG=${SCRIPT_PATH}/CONFIG
+fi
+GRID=`cat $CONFIG |grep -v "#" |grep  GRIDENGINE |tail -n 1 |awk '{print $2}'`
+
+if [ $GRID == "SGE" ]; then
+   jobid=$SGE_TASK_ID
+elif [ $GRID == "SLURM" ]; then
+   jobid=$SLURM_ARRAY_TASK_ID
+fi
+
 if [ x$jobid = x -o x$jobid = xundefined -o x$jobid = x0 ]; then
 jobid=$1
 fi
