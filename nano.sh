@@ -29,6 +29,13 @@ SCRIPT_PATH=$BASH_SOURCE
 SCRIPT_PATH=`dirname $SCRIPT_PATH`
 JAVA_PATH=$SCRIPT_PATH:.
 
+if [ -e `pwd`/CONFIG ]; then
+   CONFIG=`pwd`/CONFIG
+else
+   CONFIG=${SCRIPT_PATH}/CONFIG
+fi
+GRID=`cat $CONFIG |grep -v "#" |grep  GRIDENGINE |tail -n 1 |awk '{print $2}'`
+
 ASM=$1
 READS=$2
 ASMPREFIX=`echo $1 |sed s/.fasta//g |sed s/.fna//g |sed s/.fa//g`
@@ -92,6 +99,17 @@ NUM_JOBS=`wc -l $ASMPREFIX.fofn |awk '{print $1}'`
 echo "Running with $PREFIX $ASM $READS mappings on $NUM_CTG contigs ($NUM_JOBS) jobs"
 
 # now we can submit each range as an individual job and a merge job for the end
-qsub -A ${ASMPREFIX}_nanopolish -V -pe thread 8 -l mem_free=2g -cwd -N "${ASMPREFIX}map" -j y -o `pwd`/map.out $SCRIPT_PATH/map.sh
-qsub -A ${ASMPREFIX}_nanopolish -V -pe thread 4 -l mem_free=2g  -hold_jid "${ASMPREFIX}map" -t 1-$NUM_JOBS -cwd -N "${ASMPREFIX}nano" -j y  -o `pwd`/\$TASK_ID.polish.out $SCRIPT_PATH/nanoParallelSGE.sh
-qsub -A ${ASMPREFIX}_nanopolish -V -pe thread 1 -l mem_free=10g -hold_jid "${ASMPREFIX}nano" -cwd -N "${ASMPREFIX}merge" -j y -o `pwd`/merge.out $SCRIPT_PATH/merge.sh
+if [ $GRID == "SGE" ]; then
+  qsub -A ${ASMPREFIX}_nanopolish -V -pe thread 8 -l mem_free=2g -cwd -N "${ASMPREFIX}map" -j y -o `pwd`/map.out $SCRIPT_PATH/map.sh
+  qsub -A ${ASMPREFIX}_nanopolish -V -pe thread 4 -l mem_free=2g  -hold_jid "${ASMPREFIX}map" -t 1-$NUM_JOBS -cwd -N "${ASMPREFIX}nano" -j y  -o `pwd`/\$TASK_ID.polish.out $SCRIPT_PATH/nanoParallelSGE.sh
+  qsub -A ${ASMPREFIX}_nanopolish -V -pe thread 1 -l mem_free=10g -hold_jid "${ASMPREFIX}nano" -cwd -N "${ASMPREFIX}merge" -j y -o `pwd`/merge.out $SCRIPT_PATH/merge.sh
+elif [ $GRID == "SLURM" ]; then
+  sbatch -J ${ASMPREFIX}_nanopolish -D `pwd` --cpus-per-task=8 --mem-per-cpu=2g  --time=72:00:00 -o `pwd`/map.out $SCRIPT_PATH/map.sh > map.submit.out 2>&1
+  job=`cat map.submit.out |tail -n 1`
+  sbatch -J ${ASMPREFIX}_nanopolish -D `pwd` --cpus-per-task=4 --mem-per-cpu=2g  --time=72:00:00 --depend=afterany:$job -a 1-$NUM_JOBS -o `pwd`/%A_%a.polish.out $SCRIPT_PATH/nanoParallelSGE.sh > nanoParallel.jobSubmit.out 2>&1
+  job=`cat nanoParallel.submit.out |tail -n 1`
+  sbatch -J ${ASMPREFIX}_nanopolish -D `pwd` --cpus-per-task=1 --mem-per-cpu=10g --time=72:00:00 --depend=afterany:$job -o `pwd`/merge.out $SCRIPT_PATH/merge.sh
+else
+   echo "Error: unknown grid engine specified $GRID, currently supported are SGE or SLURM"
+   exit
+fi
