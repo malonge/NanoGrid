@@ -106,7 +106,7 @@ if [ $GRID == "SGE" ]; then
 elif [ $GRID == "SLURM" ]; then
   sbatch -J ${ASMPREFIX}_nanopolish -D `pwd` --cpus-per-task=8 --mem-per-cpu=2g  --time=72:00:00 -o `pwd`/map.out $SCRIPT_PATH/map.sh > map.submit.out 2>&1
   job=`cat map.submit.out |tail -n 1`
-  sbatch -J ${ASMPREFIX}_nanopolish -D `pwd` --cpus-per-task=4 --mem-per-cpu=2g  --time=72:00:00 --depend=afterany:$job -a 1-$NUM_JOBS -o `pwd`/%A_%a.polish.out $SCRIPT_PATH/nanoParallelSGE.sh > nanoParallel.jobSubmit.out 2>&1
+  sbatch -J ${ASMPREFIX}_nanopolish -D `pwd` --cpus-per-task=4 --mem-per-cpu=2g  --time=72:00:00 --depend=afterany:$job -a 1-$NUM_JOBS -o `pwd`/%A_%a.polish.out $SCRIPT_PATH/nanoParallelSGE.sh > nanoParallel.submit.out 2>&1
   job=`cat nanoParallel.submit.out |tail -n 1`
   sbatch -J ${ASMPREFIX}_nanopolish -D `pwd` --cpus-per-task=1 --mem-per-cpu=10g --time=72:00:00 --depend=afterany:$job -o `pwd`/merge.out $SCRIPT_PATH/merge.sh
 else

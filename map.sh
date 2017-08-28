@@ -34,8 +34,8 @@ else
    if [ ! -e $PREFIX.map.success ]; then
       (bwa mem -x ont2d -t 8 $ASM $READS > $PREFIX.sam && touch $PREFIX.map.success)
       if [ -e $PREFIX.map.success ]; then
-         /data/projects/phillippy/software/samtools-develop/samtools sort -O cram -o $PREFIX.sorted.cram -T $PREFIX.tmp --reference=asm.fa $PREFIX.sam
-         /data/projects/phillippy/software/samtools-develop/samtools index $PREFIX.sorted.cram
+         samtools sort -O cram -o $PREFIX.sorted.cram -T $PREFIX.tmp --reference=asm.fa $PREFIX.sam
+         samtools index $PREFIX.sorted.cram
       fi
    fi
 fi
