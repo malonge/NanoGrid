@@ -34,19 +34,30 @@ fi
 GRID=`cat $CONFIG |grep -v "#" |grep  GRIDENGINE |tail -n 1 |awk '{print $2}'`
 
 if [ $GRID == "SGE" ]; then
-   jobid=$SGE_TASK_ID
+   baseid=$SGE_TASK_ID
+   offset=$1
 elif [ $GRID == "SLURM" ]; then
-   jobid=$SLURM_ARRAY_TASK_ID
+   baseid=$SLURM_ARRAY_TASK_ID
+   offset=$1
 fi
 
-if [ x$jobid = x -o x$jobid = xundefined -o x$jobid = x0 ]; then
-jobid=$1
+if [ x$baseid = x -o x$baseid = xundefined -o x$baseid = x0 ]; then
+  baseid=$1
+  offset=0
 fi
+
+if [ x$offset = x ]; then
+  offset=0
+fi
+
+jobid=`expr $baseid + $offset`
 
 if test x$jobid = x; then
   echo Error: I need SGE_TASK_ID set, or a job index on the command line
   exit 1
 fi
+
+echo Running job $jobid based on command line options.
 
 # now figure out which contig we are
 NUM_JOBS=`wc -l $ASMPREFIX.fofn |awk '{print $1}'`
