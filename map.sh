@@ -32,7 +32,7 @@ else
       bwa index $ASM && touch $PREFIX.index.success
    fi
    if [ ! -e $PREFIX.map.success ]; then
-      (bwa mem -x ont2d -t 8 $ASM $READS > $PREFIX.sam && touch $PREFIX.map.success)
+      (bwa mem -x ont2d -t 16 $ASM $READS > $PREFIX.sam && touch $PREFIX.map.success)
       if [ -e $PREFIX.map.success ]; then
          samtools sort -O cram -o $PREFIX.sorted.cram -T $PREFIX.tmp --reference=asm.fa $PREFIX.sam
          samtools index $PREFIX.sorted.cram
