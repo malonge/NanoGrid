@@ -111,7 +111,7 @@ elif [ $GRID == "SLURM" ]; then
   # get batch limits
   maxarray=`scontrol show config | grep MaxArraySize |awk '{print $NF-1}'`
 
-  sbatch -J ${ASMPREFIX}_extract -D `pwd` --cpus-per-task=1 --mem-per-cpu=10g --time=240:00:00 -o `pwd`/extract.out $SCRIT_PATH/extract.sh > extract.submit.out 2>&1 
+  sbatch -J ${ASMPREFIX}_extract -D `pwd` --cpus-per-task=1 --mem-per-cpu=10g --time=240:00:00 -o `pwd`/extract.out $SCRIPT_PATH/extract.sh > extract.submit.out 2>&1 
   job=`cat extract.submit.out |awk '{print "afterany:"$NF}' |tr '\n' ',' |awk '{print substr($0, 1, length($0)-1)}'`
   echo "Submitted extract job $job"
   sbatch -J ${ASMPREFIX}_map -D `pwd` --cpus-per-task=16 --mem-per-cpu=5g --time=240:00:00 --depend=$job -o `pwd`/map.out $SCRIPT_PATH/map.sh > map.submit.out 2>&1
