@@ -23,16 +23,21 @@
 ASM=`cat asm`
 PREFIX=`cat prefix`
 SCRIPT_PATH=`cat scripts`
-READS=`cat reads`
+READS=`cat readsextracted`
 
 if [ -e $PREFIX.sorted.cram ]; then
    echo "Already done"
 else
+   if [ ! -e $READS.fa.gz ]; then
+      echo "Error no reads found to map, check the output of extract.out"
+      exit
+   fi
+i
    if [ ! -e $ASM.sa ]; then
       bwa index $ASM && touch $PREFIX.index.success
    fi
    if [ ! -e $PREFIX.map.success ]; then
-      (bwa mem -x ont2d -t 16 $ASM $READS > $PREFIX.sam && touch $PREFIX.map.success)
+      (bwa mem -x ont2d -t 16 $ASM $READS.fa.gz > $PREFIX.sam && touch $PREFIX.map.success)
       if [ -e $PREFIX.map.success ]; then
          samtools sort -O cram -o $PREFIX.sorted.cram -T $PREFIX.tmp --reference=asm.fa $PREFIX.sam
          samtools index $PREFIX.sorted.cram

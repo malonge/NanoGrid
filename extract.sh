@@ -23,16 +23,29 @@
 ASM=`cat asm`
 PREFIX=`cat prefix`
 SCRIPT_PATH=`cat scripts`
-RAW=`cat raw`
-READS=`cat reads`
+RAW=`cat readsraw`
 
-if [ x$READS != "x" ] && [ -e $READS ]; then
+if [ -e readsextracted ]; then
+   READS=`cat readsextracted`
+fi
+
+if [ x$READS != "x" ] && [ -e $READS.fa.gz ]; then
    echo "Already done"
 else
-   if [ eventless ]; then
-      $SCRIPT_PATH/nanopolish nanopolish index -d $RAW reads.fastq && echo "reads" > reads
+   fast5File=`find -L $RAW -name *.fast5 |head -n 1`
+   eventless=`h5ls -r $fast5File |grep -c "event_detection" |wc -l |awk '{if ($1 <= 0) print "1"; else print "0"; }'`
+   text="with"
+   if [ $eventless -eq 1 ]; then
+      text="without"
+   fi
+
+   echo "Using $fast5File determined that basecalling was done $text event calling"
+   if [ $eventless -eq 1 ]; then
+      # make a single fastq file and index it
+      cat `find -L $RAW -name *.fastq` > reads
+      $SCRIPT_PATH/nanopolish/nanopolish nanopolish index -d $RAW reads && echo "reads" > readsextracted
    else
-     $SCRIPT_PATH/nanopolish/nanopolish extract -r $RAW > reads.fa && echo "reads" > reads
-     bgzip reads.fa
+      # extract and index the fastq
+      $SCRIPT_PATH/nanopolish/nanopolish extract -r -q -o reads $RAW && echo "reads" > readsextracted
    fi
 fi

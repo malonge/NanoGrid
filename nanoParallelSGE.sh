@@ -24,7 +24,7 @@ ASM=`cat asm`
 PREFIX=`cat prefix`
 ASMPREFIX=`cat asmprefix`
 SCRIPT_PATH=`cat scripts`
-READS=`cat reads`
+READS=`cat readsextracted`
 
 if [ -e `pwd`/CONFIG ]; then
    CONFIG=`pwd`/CONFIG
@@ -78,4 +78,4 @@ if [ -e $ASMPREFIX.$jobid.fa ]; then
    exit 
 fi
 
-$SCRIPT_PATH/nanopolish/nanopolish variants --faster --consensus=$ASMPREFIX.$jobid.fa -w $line -r $READS -b $PREFIX.sorted.cram -g $ASM -t 4 --min-candidate-frequency 0.1
+$SCRIPT_PATH/nanopolish/nanopolish variants --faster --consensus=$ASMPREFIX.$jobid.fa -w $line -r $READS -b $PREFIX.sorted.cram -g $ASM -t 16 --min-candidate-frequency 0.01 --fix-homopolymers
