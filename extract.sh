@@ -22,60 +22,17 @@
 
 ASM=`cat asm`
 PREFIX=`cat prefix`
-ASMPREFIX=`cat asmprefix`
 SCRIPT_PATH=`cat scripts`
+RAW=`cat raw`
 READS=`cat reads`
 
-if [ -e `pwd`/CONFIG ]; then
-   CONFIG=`pwd`/CONFIG
-else
-   CONFIG=${SCRIPT_PATH}/CONFIG
-fi
-GRID=`cat $CONFIG |grep -v "#" |grep  GRIDENGINE |tail -n 1 |awk '{print $2}'`
-
-if [ $GRID == "SGE" ]; then
-   baseid=$SGE_TASK_ID
-   offset=$1
-elif [ $GRID == "SLURM" ]; then
-   baseid=$SLURM_ARRAY_TASK_ID
-   offset=$1
-fi
-
-if [ x$baseid = x -o x$baseid = xundefined -o x$baseid = x0 ]; then
-  baseid=$1
-  offset=0
-fi
-
-if [ x$offset = x ]; then
-  offset=0
-fi
-
-jobid=`expr $baseid + $offset`
-
-if test x$jobid = x; then
-  echo Error: I need SGE_TASK_ID set, or a job index on the command line
-  exit 1
-fi
-
-echo Running job $jobid based on command line options.
-
-# now figure out which contig we are
-NUM_JOBS=`wc -l $ASMPREFIX.fofn |awk '{print $1}'`
-if [ $jobid -le 0 ]; then
-   echo "Invalid job id, must be 1 or greater"
-   exit
-fi
-
-if [ $jobid -gt $NUM_JOBS ]; then
-   echo "Invalid job id, max is $NUM_JOBS"
-   exit
-fi
-
-line=`cat $ASMPREFIX.fofn |head -n $jobid |tail -n 1`
-
-if [ -e $ASMPREFIX.$jobid.fa ]; then 
+if [ x$READS != "x" ] && [ -e $READS ]; then
    echo "Already done"
-   exit 
+else
+   if [ eventless ]; then
+      $SCRIPT_PATH/nanopolish nanopolish index -d $RAW reads.fastq && echo "reads" > reads
+   else
+     $SCRIPT_PATH/nanopolish/nanopolish extract -r $RAW > reads.fa && echo "reads" > reads
+     bgzip reads.fa
+   fi
 fi
-
-$SCRIPT_PATH/nanopolish/nanopolish variants --faster --consensus=$ASMPREFIX.$jobid.fa -w $line -r $READS -b $PREFIX.sorted.cram -g $ASM -t 4 --min-candidate-frequency 0.1
