@@ -1,6 +1,6 @@
 # NanoGrid
 
-The distribution is a parallel wrapper around the [Nanopolish](https://github.com/jts/nanopolish) framework The pipeline is composed of bash scripts. 
+The distribution is a parallel wrapper around the [Nanopolish](https://github.com/jts/nanopolish) framework The pipeline is composed of bash scripts. It requires nanopolish version >0.8.0, older version may not work. If you have ultra-long reads (which aren't bam compatible for now) you must have samtools version >1.5 or newer or the pipeline will not work.
 
 The current pipeline has been designed to run on the SGE scheduling system and has hard-coded grid resource request parameters. You must edit pilon.sh to match your grid options. It is, in principle, possible to run on other grid engines but will require editing all shell scripts to not use SGE_TASK_ID but the appropriate variable for your grid environment and editing the qsub commands in pilon.sh to the appropriate commands for your grid environment.
 
