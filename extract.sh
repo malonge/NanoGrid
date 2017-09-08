@@ -33,7 +33,7 @@ if [ x$READS != "x" ] && [ -e $READS.fa.gz ]; then
    echo "Already done"
 else
    fast5File=`find -L $RAW -name *.fast5 |head -n 1`
-   eventless=`h5ls -r $fast5File |grep -c "event_detection" |wc -l |awk '{if ($1 <= 0) print "1"; else print "0"; }'`
+   eventless=`h5ls -r $fast5File |grep -c "event_detection" |awk '{if ($1 <= 0) print "1"; else print "0"; }'`
    text="with"
    if [ $eventless -eq 1 ]; then
       text="without"
