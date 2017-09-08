@@ -43,7 +43,7 @@ else
    if [ $eventless -eq 1 ]; then
       # make a single fastq file and index it
       cat `find -L $RAW -name *.fastq` > reads
-      $SCRIPT_PATH/nanopolish/nanopolish nanopolish index -d $RAW reads && echo "reads" > readsextracted
+      $SCRIPT_PATH/nanopolish/nanopolish index -d $RAW reads && echo "reads" > readsextracted
    else
       # extract and index the fastq
       $SCRIPT_PATH/nanopolish/nanopolish extract -r -q -o reads $RAW && echo "reads" > readsextracted
