@@ -105,7 +105,7 @@ if [ $GRID == "SGE" ]; then
   # assume no limits on array job
   qsub -A ${ASMPREFIX}_nanopolish -V -pe thread 1  -l mem_free=10g                                 -cwd -N "${ASMPREFIX}extract" -j y -o `pwd`/extract.out $SCRIPT_PATH/extract.sh
   qsub -A ${ASMPREFIX}_nanopolish -V -pe thread 16 -l mem_free=2g  -hold_jid "${ASMPREFIX}extract" -cwd -N "${ASMPREFIX}map" -j y -o `pwd`/map.out $SCRIPT_PATH/map.sh
-  qsub -A ${ASMPREFIX}_nanopolish -V -pe thread 16 -l mem_free=2g  -hold_jid "${ASMPREFIX}map"     -cwd -N "${ASMPREFIX}nano" -t 1-$NUM_JOBS -j y  -o `pwd`/\$TASK_ID.polish.out $SCRIPT_PATH/nanoParallelSGE.sh 0
+  qsub -A ${ASMPREFIX}_nanopolish -V -pe thread 16 -l mem_free=5g  -hold_jid "${ASMPREFIX}map"     -cwd -N "${ASMPREFIX}nano" -t 1-$NUM_JOBS -j y  -o `pwd`/\$TASK_ID.polish.out $SCRIPT_PATH/nanoParallelSGE.sh 0
   qsub -A ${ASMPREFIX}_nanopolish -V -pe thread 1  -l mem_free=10g -hold_jid "${ASMPREFIX}nano" -cwd -N "${ASMPREFIX}merge" -j y -o `pwd`/merge.out $SCRIPT_PATH/merge.sh
 elif [ $GRID == "SLURM" ]; then
   # get batch limits
@@ -114,7 +114,7 @@ elif [ $GRID == "SLURM" ]; then
   sbatch -J ${ASMPREFIX}_extract -D `pwd` --cpus-per-task=1 --mem-per-cpu=10g --time=240:00:00 -o `pwd`/extract.out $SCRIT_PATH/extract.sh > extract.submit.out 2>&1 
   job=`cat extract.submit.out |awk '{print "afterany:"$NF}' |tr '\n' ',' |awk '{print substr($0, 1, length($0)-1)}'`
   echo "Submitted extract job $job"
-  sbatch -J ${ASMPREFIX}_map -D `pwd` --cpus-per-task=16 --mem-per-cpu=2g --time=240:00:00 --depend=$job -o `pwd`/map.out $SCRIPT_PATH/map.sh > map.submit.out 2>&1
+  sbatch -J ${ASMPREFIX}_map -D `pwd` --cpus-per-task=16 --mem-per-cpu=5g --time=240:00:00 --depend=$job -o `pwd`/map.out $SCRIPT_PATH/map.sh > map.submit.out 2>&1
   job=`cat map.submit.out |awk '{print "afterany:"$NF}' |tr '\n' ',' |awk '{print substr($0, 1, length($0)-1)}'`
   echo "Submitted mapping job $job"
   > nanoParallel.submit.out
