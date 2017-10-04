@@ -73,8 +73,10 @@ fi
 
 # check for files so we donn't overwrite
 if [ -e reads.fa ] || [ -e reads ] ||  [ -e reads.fa.gz ]; then
-   echo "Error: already a reads/reads.fa/reads.fa.gz file. Please remove as these will be generated at runtime."
-   exit
+   if [ ! -e extracted.success ]; then
+      echo "Error: already a reads/reads.fa/reads.fa.gz file. Please remove as these will be generated at runtime."
+      exit
+   fi
 fi
 
 # nanopolish only understand .fa extension, check for those

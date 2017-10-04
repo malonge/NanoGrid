@@ -33,7 +33,7 @@ if [ x$READS != "x" ] && [ -e $READS.fa.gz ]; then
    echo "Already done"
 else
    fast5File=`find -L $RAW -name *.fast5 |head -n 1`
-   eventless=`h5ls -r $fast5File |grep -c "event_detection" |awk '{if ($1 <= 0) print "1"; else print "0"; }'`
+   eventless=`$SCRIPT_PATH/nanopolish/hdf5-1.8.14/tools/h5ls/h5ls -r $fast5File |grep -c "event_detection" |awk '{if ($1 <= 0) print "1"; else print "0"; }'`
    text="with"
    if [ $eventless -eq 1 ]; then
       text="without"
@@ -43,9 +43,9 @@ else
    if [ $eventless -eq 1 ]; then
       # make a single fastq file and index it
       cat `find -L $RAW -name *.fastq` > reads
-      $SCRIPT_PATH/nanopolish/nanopolish index -d $RAW reads && echo "reads" > readsextracted
+      $SCRIPT_PATH/nanopolish/nanopolish index -d $RAW reads && echo "reads" > readsextracted && touch extracted.success
    else
       # extract and index the fastq
-      $SCRIPT_PATH/nanopolish/nanopolish extract -r -q -o reads $RAW && echo "reads" > readsextracted
+      $SCRIPT_PATH/nanopolish/nanopolish extract -r -q -o reads $RAW && echo "reads" > readsextracted && touch extracted.success
    fi
 fi
