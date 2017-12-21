@@ -29,7 +29,7 @@ if [ -e readsextracted ]; then
    READS=`cat readsextracted`
 fi
 
-if [ x$READS != "x" ] && [ -e $READS.fa.gz ]; then
+if [ x$READS != "x" ] && [ -e $READS ]; then
    echo "Already done"
 else
    fast5File=`find -L $RAW -name *.fast5 |head -n 1`
@@ -42,10 +42,10 @@ else
    echo "Using $fast5File determined that basecalling was done $text event calling"
    if [ $eventless -eq 1 ]; then
       # make a single fastq file and index it
-      cat `find -L $RAW -name *.fastq` > reads
-      $SCRIPT_PATH/nanopolish/nanopolish index -d $RAW reads && echo "reads" > readsextracted && touch extracted.success
+      cat `find -L $RAW -name *.fastq` > reads.fastq
+      $SCRIPT_PATH/nanopolish/nanopolish index -d $RAW reads.fastq && echo "reads.fastq" > readsextracted && touch extracted.success
    else
       # extract and index the fastq
-      $SCRIPT_PATH/nanopolish/nanopolish extract -r -q -o reads $RAW && echo "reads" > readsextracted && touch extracted.success
+      $SCRIPT_PATH/nanopolish/nanopolish extract -r -q -o reads.fastq $RAW && echo "reads.fastq" > readsextracted && touch extracted.success
    fi
 fi

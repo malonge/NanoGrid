@@ -72,9 +72,9 @@ if [ ! -d $READS ]; then
 fi
 
 # check for files so we donn't overwrite
-if [ -e reads.fa ] || [ -e reads ] ||  [ -e reads.fa.gz ]; then
+if [ -e reads.fa ] || [ -e reads.fastq ]; then
    if [ ! -e extracted.success ]; then
-      echo "Error: already a reads/reads.fa/reads.fa.gz file. Please remove as these will be generated at runtime."
+      echo "Error: already a reads/reads.fa/reads.fastq file. Please remove as these will be generated at runtime."
       exit
    fi
 fi
