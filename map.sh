@@ -33,13 +33,13 @@ else
       exit
    fi
 i
-   if [ ! -e $ASM.sa ]; then
-      bwa index $ASM && touch $PREFIX.index.success
+   if [ ! -e $ASM.mmi ]; then
+      minimap2 -ax map-ont -d $ASM.mmi $ASM && touch $PREFIX.index.success
    fi
    if [ ! -e $PREFIX.map.success ]; then
-      (bwa mem -x ont2d -t 16 $ASM $READS > $PREFIX.sam && touch $PREFIX.map.success)
+      minimap2 -ax map-ont -t 16 --secondary=no $ASM.mmi $READS > $PREFIX.sam && touch $PREFIX.map.success)
       if [ -e $PREFIX.map.success ]; then
-         samtools sort -O cram -o $PREFIX.sorted.cram -T $PREFIX.tmp --reference=asm.fa $PREFIX.sam
+         samtools sort -@16 -O cram -o $PREFIX.sorted.cram -T $PREFIX.tmp --reference=$ASM $PREFIX.sam
          samtools index $PREFIX.sorted.cram
       fi
    fi
