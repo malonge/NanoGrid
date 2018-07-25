@@ -39,11 +39,6 @@ elif [ $GRID == "SLURM" ]; then
    cores=$SLURM_CPUS_PER_TASK
 fi
 
-if [ x$baseid = x -o x$baseid = xundefined -o x$baseid = x0 ]; then
-  baseid=$1
-  offset=0
-  cores=`grep -c ^processor /proc/cpuinfo`
-
 if [ -e $PREFIX.sorted.cram ]; then
    echo "Already done"
 else
