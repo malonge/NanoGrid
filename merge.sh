@@ -30,4 +30,4 @@ if [ -e $ASMPREFIX.polished.fa ]; then
    exit
 fi
 
-python $SCRIPT_PATH/nanopolish/scripts/nanopolish_merge.py $ASMPREFIX.[0-9]*.fa > $ASMPREFIX.polished.fa && rm $ASMPREFIX.[0-9]*.fa
+$SCRIPT_PATH/nanopolish/nanopolish vcf2fasta -g $ASM $ASMPREFIX.[0-9]*.vcf > $ASMPREFIX.polished.fa && gzip $ASMPREFIX.[0-9]*.vcf

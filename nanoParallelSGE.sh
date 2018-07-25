@@ -36,14 +36,17 @@ GRID=`cat $CONFIG |grep -v "#" |grep  GRIDENGINE |tail -n 1 |awk '{print $2}'`
 if [ $GRID == "SGE" ]; then
    baseid=$SGE_TASK_ID
    offset=$1
+   cores=$NSLOTS
 elif [ $GRID == "SLURM" ]; then
    baseid=$SLURM_ARRAY_TASK_ID
    offset=$1
+   cores=$SLURM_CPUS_PER_TASK
 fi
 
 if [ x$baseid = x -o x$baseid = xundefined -o x$baseid = x0 ]; then
   baseid=$1
   offset=0
+  cores=`grep -c ^processor /proc/cpuinfo`
 fi
 
 if [ x$offset = x ]; then
@@ -73,9 +76,9 @@ fi
 
 line=`cat $ASMPREFIX.fofn |head -n $jobid |tail -n 1`
 
-if [ -e $ASMPREFIX.$jobid.fa ]; then 
+if [ -e $ASMPREFIX.$jobid.vcf ]; then 
    echo "Already done"
    exit 
 fi
 
-$SCRIPT_PATH/nanopolish/nanopolish variants --faster --consensus=$ASMPREFIX.$jobid.fa -w $line -r $READS -b $PREFIX.sorted.cram -g $ASM -t 16 --min-candidate-frequency 0.01 --fix-homopolymers
+$SCRIPT_PATH/nanopolish/nanopolish variants --methylation-aware=cpg --consensus=$ASMPREFIX.$jobid.vcf -w $line -r $READS -b $PREFIX.sorted.cram -g $ASM -t $cores --min-candidate-frequency 0.01 --fix-homopolymers

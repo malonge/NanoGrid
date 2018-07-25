@@ -25,6 +25,25 @@ PREFIX=`cat prefix`
 SCRIPT_PATH=`cat scripts`
 READS=`cat readsextracted`
 
+if [ -e `pwd`/CONFIG ]; then
+   CONFIG=`pwd`/CONFIG
+else
+   CONFIG=${SCRIPT_PATH}/CONFIG
+fi
+
+GRID=`cat $CONFIG |grep -v "#" |grep  GRIDENGINE |tail -n 1 |awk '{print $2}'`
+
+if [ $GRID == "SGE" ]; then
+   cores=$NSLOTS
+elif [ $GRID == "SLURM" ]; then
+   cores=$SLURM_CPUS_PER_TASK
+fi
+
+if [ x$baseid = x -o x$baseid = xundefined -o x$baseid = x0 ]; then
+  baseid=$1
+  offset=0
+  cores=`grep -c ^processor /proc/cpuinfo`
+
 if [ -e $PREFIX.sorted.cram ]; then
    echo "Already done"
 else
@@ -37,9 +56,9 @@ i
       minimap2 -ax map-ont -d $ASM.mmi $ASM && touch $PREFIX.index.success
    fi
    if [ ! -e $PREFIX.map.success ]; then
-      minimap2 -ax map-ont -t 16 --secondary=no $ASM.mmi $READS > $PREFIX.sam && touch $PREFIX.map.success)
+      minimap2 -ax map-ont -t $cores --secondary=no $ASM.mmi $READS > $PREFIX.sam && touch $PREFIX.map.success
       if [ -e $PREFIX.map.success ]; then
-         samtools sort -@16 -O cram -o $PREFIX.sorted.cram -T $PREFIX.tmp --reference=$ASM $PREFIX.sam
+         samtools sort -@${cores} -O cram -o $PREFIX.sorted.cram -T $PREFIX.tmp --reference=$ASM $PREFIX.sam
          samtools index $PREFIX.sorted.cram
       fi
    fi
