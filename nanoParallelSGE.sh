@@ -81,4 +81,4 @@ if [ -e $ASMPREFIX.$jobid.vcf ]; then
    exit 
 fi
 
-$SCRIPT_PATH/nanopolish/nanopolish variants --methylation-aware=cpg --consensus -o $ASMPREFIX.$jobid.vcf -w $line -r $READS -b $PREFIX.sorted.cram -g $ASM -t $cores --min-candidate-frequency 0.01 --fix-homopolymers
+$SCRIPT_PATH/nanopolish/nanopolish variants --consensus -o $ASMPREFIX.$jobid.vcf -w $line -r reads.fa -b $PREFIX.sorted.bam -g $ASM -t $cores --min-candidate-frequency 0.01 --fix-homopolymers

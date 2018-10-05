@@ -72,12 +72,12 @@ if [ ! -d $READS ]; then
 fi
 
 # check for files so we donn't overwrite
-if [ -e reads.fa ] || [ -e reads.fastq ]; then
-   if [ ! -e extracted.success ]; then
-      echo "Error: already a reads/reads.fa/reads.fastq file. Please remove as these will be generated at runtime."
-      exit
-   fi
-fi
+#if [ -e reads.fa ] || [ -e reads.fastq ]; then
+#   if [ ! -e extracted.success ]; then
+#      echo "Error: already a reads/reads.fa/reads.fastq file. Please remove as these will be generated at runtime."
+#      exit
+#   fi
+#fi
 
 # nanopolish only understand .fa extension, check for those
 if [ "$ASM" != "$ASMPREFIX.fa" ]; then
@@ -105,8 +105,8 @@ echo "Running with $PREFIX $ASM $READS mappings on $NUM_CTG contigs ($NUM_JOBS) 
 # now we can submit each range as an individual job and a merge job for the end
 if [ $GRID == "SGE" ]; then
   # assume no limits on array job
-  qsub -A ${ASMPREFIX}_nanopolish -V -pe thread 1  -l mem_free=10g                                 -cwd -N "${ASMPREFIX}extract" -j y -o `pwd`/extract.out $SCRIPT_PATH/extract.sh
-  qsub -A ${ASMPREFIX}_nanopolish -V -pe thread 32 -l mem_free=2g  -hold_jid "${ASMPREFIX}extract" -cwd -N "${ASMPREFIX}map" -j y -o `pwd`/map.out $SCRIPT_PATH/map.sh
+  #qsub -A ${ASMPREFIX}_nanopolish -V -pe thread 1  -l mem_free=10g                                 -cwd -N "${ASMPREFIX}extract" -j y -o `pwd`/extract.out $SCRIPT_PATH/extract.sh
+  #qsub -A ${ASMPREFIX}_nanopolish -V -pe thread 32 -l mem_free=2g  -hold_jid "${ASMPREFIX}extract" -cwd -N "${ASMPREFIX}map" -j y -o `pwd`/map.out $SCRIPT_PATH/map.sh
   qsub -A ${ASMPREFIX}_nanopolish -V -pe thread 16 -l mem_free=5g  -hold_jid "${ASMPREFIX}map"     -cwd -N "${ASMPREFIX}nano" -t 1-$NUM_JOBS -j y  -o `pwd`/\$TASK_ID.polish.out $SCRIPT_PATH/nanoParallelSGE.sh 0
   qsub -A ${ASMPREFIX}_nanopolish -V -pe thread 1  -l mem_free=10g -hold_jid "${ASMPREFIX}nano" -cwd -N "${ASMPREFIX}merge" -j y -o `pwd`/merge.out $SCRIPT_PATH/merge.sh
 elif [ $GRID == "SLURM" ]; then
