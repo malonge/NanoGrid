@@ -107,8 +107,8 @@ if [ $GRID == "SGE" ]; then
   # assume no limits on array job
   #qsub -A ${ASMPREFIX}_nanopolish -V -pe thread 1  -l mem_free=10g                                 -cwd -N "${ASMPREFIX}extract" -j y -o `pwd`/extract.out $SCRIPT_PATH/extract.sh
   #qsub -A ${ASMPREFIX}_nanopolish -V -pe thread 32 -l mem_free=2g  -hold_jid "${ASMPREFIX}extract" -cwd -N "${ASMPREFIX}map" -j y -o `pwd`/map.out $SCRIPT_PATH/map.sh
-  qsub -A ${ASMPREFIX}_nanopolish -V -pe thread 16 -l mem_free=5g  -hold_jid "${ASMPREFIX}map"     -cwd -N "${ASMPREFIX}nano" -t 1-$NUM_JOBS -j y  -o `pwd`/\$TASK_ID.polish.out $SCRIPT_PATH/nanoParallelSGE.sh 0
-  qsub -A ${ASMPREFIX}_nanopolish -V -pe thread 1  -l mem_free=10g -hold_jid "${ASMPREFIX}nano" -cwd -N "${ASMPREFIX}merge" -j y -o `pwd`/merge.out $SCRIPT_PATH/merge.sh
+  qsub -A ${ASMPREFIX}_nanopolish -V -pe threads 16 -l m_mem_free=5g  -hold_jid "${ASMPREFIX}map"     -cwd -N "${ASMPREFIX}nano" -t 1-$NUM_JOBS -j y  -o `pwd`/\$TASK_ID.polish.out $SCRIPT_PATH/nanoParallelSGE.sh 0
+  qsub -A ${ASMPREFIX}_nanopolish -V -pe threads 1  -l m_mem_free=10g -hold_jid "${ASMPREFIX}nano" -cwd -N "${ASMPREFIX}merge" -j y -o `pwd`/merge.out $SCRIPT_PATH/merge.sh
 elif [ $GRID == "SLURM" ]; then
   # get batch limits
   maxarray=`scontrol show config | grep MaxArraySize |awk '{print $NF-1}'`

@@ -20,6 +20,8 @@
 #  Please cite the authors in any work or product based on this material.
 ######################################################################
 
+export LD_LIBRARY_PATH=/isilon/seq/schatz/tomato_ont/M82/nanopolish/nanopolish.2018.10.05/mschatz/lib64:$LD_LIBRARY_PATH
+
 ASM=`cat asm`
 PREFIX=`cat prefix`
 ASMPREFIX=`cat asmprefix`
